@@ -2,6 +2,17 @@
 
 An automated accessibility testing tool built with Playwright and axe-core, designed to scan websites for WCAG accessibility violations and generate a detailed, color-coded HTML report.
 
+## Table of Contents
+- [Features](#features)
+- [Why I Built This](#why-i-built-this)
+- [Tech Stack](#tech-stack)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Sample Report](#sample-report)
+- [Test Results (Pass/Fail)](#test-results-passfail)
+- [Sample Finding](#sample-finding)
+- [Future Improvements](#future-improvements)
+
 ## Features
 
 - Scans one or multiple websites/pages for accessibility violations
@@ -10,6 +21,7 @@ An automated accessibility testing tool built with Playwright and axe-core, desi
   - Violation severity (critical, serious, moderate, minor)
   - Affected element selectors
   - Raw HTML of the affected elements
+- Uses assertion-based pass/fail logic — automatically fails any page with `critical`/`serious` violations, while allowing `minor`/`moderate` issues through (risk-based testing, suitable for CI/CD build gates)
 - Built with Playwright + TypeScript
 
 ## Why I Built This
@@ -25,44 +37,48 @@ As part of learning Playwright for QA automation, I wanted to go beyond basic UI
 ## Setup
 
 1. Clone this repository
-```bash
+   ```bash
    git clone <your-repo-url>
    cd accessibility-audit-tool
-```
+   ```
 
 2. Install dependencies
-```bash
+   ```bash
    npm install
-```
+   ```
 
 3. Install Playwright browsers
-```bash
+   ```bash
    npx playwright install
-```
+   ```
 
 ## Usage
 
 1. Open `tests/scan.spec.ts` and edit the `websitesToScan` array with the URLs you want to test:
-```typescript
+   ```typescript
    const websitesToScan = [
      'https://example.com',
      'https://example.com/about',
-
    ];
-```
+   ```
 
 2. Run the scan
-```bash
+   ```bash
    npx playwright test scan.spec.ts --project=chromium --workers=1
-```
+   ```
 
 3. Open the generated report
+   ```
+   accessibility-report.html
+   ```
+
+**Note:** This tool uses assertion-based pass/fail logic — any page with `critical` or `serious` severity violations will cause the test to fail, while `minor`/`moderate` violations are allowed to pass. This is intentional and mirrors how the tool would behave as a CI/CD build gate, rather than just generating a passive report.
 
 ## Sample Report
 
-![Accessibility Report Overview](./screenshots/report-overview.png)
-
 The report shows violations grouped by page, with severity-based color coding and exact HTML selectors for each issue.
+
+![Accessibility Report Overview](./screenshots/report-overview.png)
 
 ![Violation Detail](./screenshots/violation-detail.png)
 
@@ -80,7 +96,10 @@ While testing against a real hospital website, this tool identified a recurring 
 
 ## Future Improvements
 
+- [x] Add assertion-based pass/fail logic for critical/serious violations
+- [ ] Add error handling for unreachable pages and timeouts
+- [ ] Move hardcoded URLs into a config file or CLI argument
+- [ ] Add CI/CD integration (GitHub Actions) for scheduled scans
 - [ ] Add support for scanning an entire sitemap automatically
 - [ ] Group and highlight duplicate violations across pages
-- [ ] Add CI/CD integration (GitHub Actions) for scheduled scans
 - [ ] Export reports in JSON/CSV for further analysis
