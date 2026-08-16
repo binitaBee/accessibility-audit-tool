@@ -97,8 +97,8 @@ While testing against a real hospital website, this tool identified a recurring 
 ## Future Improvements
 
 - [x] Add assertion-based pass/fail logic for critical/serious violations
-- [ ] Add error handling for unreachable pages and timeouts
-- [ ] Move hardcoded URLs into a config file or CLI argument
+- [x] Add error handling for unreachable pages and timeouts
+- [x] Move hardcoded URLs into a config file or CLI argument
 - [ ] Add CI/CD integration (GitHub Actions) for scheduled scans
 - [ ] Add support for scanning an entire sitemap automatically
 - [ ] Group and highlight duplicate violations across pages
