@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import * as fs from 'fs';
 
@@ -25,6 +25,20 @@ for (const url of websitesToScan) {
     });
 
     console.log(`Scanned ${url}: ${results.violations.length} violations found`);
+
+    // শুধু critical ও serious severity-এর violation আলাদা করে বের করা হচ্ছে
+    const highImpactViolations = results.violations.filter(
+      (v) => v.impact === 'critical' || v.impact === 'serious'
+    );
+
+    if (highImpactViolations.length > 0) {
+      console.log(
+        `⚠️  Found ${highImpactViolations.length} high-impact violation(s) on ${url}`
+      );
+    }
+
+    // এই assertion-টাই test-কে pass/fail নির্ধারণ করবে
+    expect(highImpactViolations.length).toBe(0);
   });
 }
 
