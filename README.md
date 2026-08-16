@@ -47,6 +47,7 @@ As part of learning Playwright for QA automation, I wanted to go beyond basic UI
    const websitesToScan = [
      'https://example.com',
      'https://example.com/about',
+
    ];
 ```
 
@@ -56,6 +57,15 @@ As part of learning Playwright for QA automation, I wanted to go beyond basic UI
 ```
 
 3. Open the generated report
+
+## Sample Report
+
+![Accessibility Report Overview](./screenshots/report-overview.png)
+
+The report shows violations grouped by page, with severity-based color coding and exact HTML selectors for each issue.
+
+![Violation Detail](./screenshots/violation-detail.png)
+
 ## Sample Finding
 
 While testing against a real hospital website, this tool identified a recurring issue across multiple pages: a logo link with no discernible text for screen readers (`alt=""` on the only child image). Because the logo appears in the shared site header, this single fix would resolve the accessibility gap site-wide — a good example of how automated scanning can surface high-impact, low-effort fixes.
