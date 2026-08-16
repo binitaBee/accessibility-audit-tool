@@ -2,13 +2,9 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import * as fs from 'fs';
 
-const websitesToScan = [
-  'https://nsh.com.bd/',
-  'https://nsh.com.bd/about',
-  'https://nagorikhospital.com/lab-tests',
-  'https://nsh.com.bd/verify-virtual-card',
-  'https://nsh.com.bd/pregnancy-due-calculator',
-];
+const configData = fs.readFileSync('config.json', 'utf-8');
+const config = JSON.parse(configData);
+const websitesToScan: string[] = config.websitesToScan;
 
 let allResults: any[] = [];
 
