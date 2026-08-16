@@ -8,14 +8,23 @@ const websitesToScan = [
   'https://nagorikhospital.com/lab-tests',
   'https://nsh.com.bd/verify-virtual-card',
   'https://nsh.com.bd/pregnancy-due-calculator',
-
 ];
 
 let allResults: any[] = [];
 
 for (const url of websitesToScan) {
   test(`accessibility scan: ${url}`, async ({ page }) => {
-    await page.goto(url);
+    try {
+      await page.goto(url, { timeout: 15000 });
+    } catch (error) {
+      console.log(`❌ Could not load ${url}: ${(error as Error).message}`);
+      allResults.push({
+        url: url,
+        violations: [],
+        loadError: true,
+      });
+      throw new Error(`Page failed to load: ${url}`);
+    }
 
     const results = await new AxeBuilder({ page }).analyze();
 
@@ -26,7 +35,6 @@ for (const url of websitesToScan) {
 
     console.log(`Scanned ${url}: ${results.violations.length} violations found`);
 
-    // শুধু critical ও serious severity-এর violation আলাদা করে বের করা হচ্ছে
     const highImpactViolations = results.violations.filter(
       (v) => v.impact === 'critical' || v.impact === 'serious'
     );
@@ -37,7 +45,6 @@ for (const url of websitesToScan) {
       );
     }
 
-    // এই assertion-টাই test-কে pass/fail নির্ধারণ করবে
     expect(highImpactViolations.length).toBe(0);
   });
 }
@@ -60,6 +67,7 @@ function generateHtmlReport(data: any[]) {
       .serious { background: #fee5cc; border-left: 5px solid orange; }
       .moderate { background: #fff8cc; border-left: 5px solid #d4b800; }
       .minor { background: #e6f2ff; border-left: 5px solid #3399ff; }
+      .load-error { background: #f0f0f0; border-left: 5px solid #888; padding: 10px; }
     </style>
   </head>
   <body>
@@ -68,27 +76,34 @@ function generateHtmlReport(data: any[]) {
 
   data.forEach((site) => {
     html += `<div class="site"><h2>${site.url}</h2>`;
+
+    if (site.loadError) {
+      html += `<div class="load-error">⚠️ This page could not be loaded (unreachable or timed out)</div>`;
+      html += `</div>`;
+      return;
+    }
+
     html += `<p>Total violations: ${site.violations.length}</p>`;
 
- site.violations.forEach((v: any) => {
-  let nodesHtml = '';
-  v.nodes.forEach((node: any) => {
-    nodesHtml += `
-      <div style="background:#fff; margin:8px 0; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:monospace; font-size:13px;">
-        <strong>Selector:</strong> ${node.target.join(', ')}<br>
-        <strong>HTML:</strong> ${node.html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-      </div>
-    `;
-  });
+    site.violations.forEach((v: any) => {
+      let nodesHtml = '';
+      v.nodes.forEach((node: any) => {
+        nodesHtml += `
+          <div style="background:#fff; margin:8px 0; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:monospace; font-size:13px;">
+            <strong>Selector:</strong> ${node.target.join(', ')}<br>
+            <strong>HTML:</strong> ${node.html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+          </div>
+        `;
+      });
 
-  html += `
-    <div class="violation ${v.impact}">
-      <strong>[${v.impact}]</strong> ${v.description}<br>
-      <small>Affected elements: ${v.nodes.length}</small>
-      ${nodesHtml}
-    </div>
-  `;
-});
+      html += `
+        <div class="violation ${v.impact}">
+          <strong>[${v.impact}]</strong> ${v.description}<br>
+          <small>Affected elements: ${v.nodes.length}</small>
+          ${nodesHtml}
+        </div>
+      `;
+    });
 
     html += `</div>`;
   });
