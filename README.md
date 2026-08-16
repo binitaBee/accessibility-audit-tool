@@ -66,6 +66,14 @@ The report shows violations grouped by page, with severity-based color coding an
 
 ![Violation Detail](./screenshots/violation-detail.png)
 
+## Test Results (Pass/Fail)
+
+The scanner doesn't just report violations — it uses assertions to automatically fail any page containing `critical` or `serious` severity violations, while allowing `minor`/`moderate` issues to pass. This makes it suitable for CI/CD pipelines as a build gate.
+
+![Test Results](./screenshots/test-results.png)
+
+In this run, 4 out of 5 pages failed due to serious accessibility issues, while one page passed because it only had moderate-severity violations.
+
 ## Sample Finding
 
 While testing against a real hospital website, this tool identified a recurring issue across multiple pages: a logo link with no discernible text for screen readers (`alt=""` on the only child image). Because the logo appears in the shared site header, this single fix would resolve the accessibility gap site-wide — a good example of how automated scanning can surface high-impact, low-effort fixes.
